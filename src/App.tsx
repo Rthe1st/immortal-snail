@@ -3,6 +3,7 @@ import { useState } from "react";
 import possessedSnail from "./possessed_snail.webp";
 import "./App.css";
 import { headingDistanceTo, LatLon, moveTo } from "geolocation-utils";
+import Radar from "./Radar";
 
 // https://hypertextbook.com/facts/1999/AngieYee.shtml
 const SNAIL_METERS_PER_SECOND = 0.013;
@@ -122,15 +123,18 @@ function App() {
           src={possessedSnail}
           alt="Artist's impression of the immortal snail"
         />
-        {dealMade && snailInformation && location ? (
-          <SnailChase
-            snailLocation={snailInformation.location}
-            location={location}
-          />
-        ) : (
-          <button onClick={makeDeal}>Make deal with snail</button>
-        )}
       </header>
+      {dealMade && snailInformation && location ? (
+        <SnailChase
+          snailLocation={snailInformation.location}
+          location={location}
+        />
+      ) : (
+        <button onClick={makeDeal}>Make deal with snail</button>
+      )}
+      <div>
+        <Radar width={2000} height={2000} />
+      </div>
     </div>
   );
 }
