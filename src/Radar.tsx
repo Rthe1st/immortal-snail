@@ -50,6 +50,8 @@ function Radar(props: RadarProperties) {
   const viewBoxHeight = 1000;
   const viewBoxWidth = 1000;
 
+  // todo: should we be using D3 to do some of this animating/transforming?
+
   return (
     <svg viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}>
       <defs>
@@ -76,6 +78,10 @@ function Radar(props: RadarProperties) {
         <clipPath id="clip">
           <circle r="600" cx="500" cy="500" />
         </clipPath>
+        <radialGradient id="myGradient">
+          <stop offset="0%" stopColor="green" stopOpacity="100%" />
+          <stop offset="100%" stopColor="white" stopOpacity="0%" />
+        </radialGradient>
       </defs>
       <circle
         cx={viewBoxWidth / 2}
@@ -95,23 +101,26 @@ function Radar(props: RadarProperties) {
           strokeWidth={4}
         />
       ))}
-      {/* <polygon
-        points={`${viewBoxWidth / 2} ${viewBoxWidth / 2}, ${
-          viewBoxWidth / 2
-        } ${viewBoxWidth}, ${viewBoxWidth} ${viewBoxWidth}`}
-        stroke="none"
-        fill="url(#linear-gradient)"
-      >
-        <animateTransform
-          attributeName="transform"
-          attributeType="XML"
-          type="rotate"
-          from={`0 ${viewBoxWidth / 2} ${viewBoxWidth / 2}`}
-          to={`360 ${viewBoxWidth / 2} ${viewBoxWidth / 2}`}
-          dur="10s"
-          repeatCount="indefinite"
-        />
-      </polygon> */}
+      <g>
+        <image
+          x="500"
+          y="650"
+          width="80"
+          height="80"
+          href="snail-icon.svg"
+        ></image>
+        <circle cx="540" cy="690" r="50">
+          <animate
+            attributeType="XML"
+            attributeName="fill"
+            values="url('#myGradient');transparent;"
+            // values="green;transparent;"
+            dur="5s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      </g>
+
       <g>
         <foreignObject x="0" y="0" width="1000" height="1000" clip="url(#clip)">
           <div
