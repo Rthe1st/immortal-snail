@@ -1,4 +1,4 @@
-import React, { Component, useMemo } from "react";
+import { useMemo } from "react";
 import * as d3 from "d3";
 
 const Axis = ({ domain = [0, 100], range = [0, 500], x = 0, y = 0 }) => {
@@ -42,6 +42,8 @@ interface RadarProperties {
   // should is br doing this with css?
   width: number;
   height: number;
+  snailX: number;
+  snailY: number;
 }
 
 function Radar(props: RadarProperties) {
@@ -103,13 +105,18 @@ function Radar(props: RadarProperties) {
       ))}
       <g>
         <image
-          x="500"
-          y="650"
+          x={Math.max(props.snailX, 500) - 40}
+          y={Math.max(props.snailY, 500) - 40}
           width="80"
           height="80"
+          // https://uxwing.com/snail-icon/</g>
           href="snail-icon.svg"
         ></image>
-        <circle cx="540" cy="690" r="50">
+        <circle
+          cx={Math.max(props.snailX, 500)}
+          cy={Math.max(props.snailY, 500)}
+          r="50"
+        >
           <animate
             attributeType="XML"
             attributeName="fill"
