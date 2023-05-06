@@ -41,10 +41,7 @@ function formatTimeTillSnail(milliseconds: number): string {
   return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
 }
 
-function SnailChase(props: {
-  location: LatLon;
-  // snailInfomation: SnailInformation;
-}) {
+function SnailChase(props: { location: LatLon }) {
   let { location } = props;
 
   const [snailInformation, setSnailInformation] =
@@ -60,7 +57,7 @@ function SnailChase(props: {
   var distance;
   var snailXDistance;
   var snailYDistance;
-  if (snailInformation !== null && location !== null) {
+  if (snailInformation !== null) {
     const headingDistance = headingDistanceTo(
       snailInformation.location,
       location
@@ -71,9 +68,11 @@ function SnailChase(props: {
       Math.cos(degToRad(headingDistance.heading)) * headingDistance.distance;
     distance = headingDistance.distance;
   } else {
-    distance = 0;
-    snailXDistance = 0;
-    snailYDistance = 0;
+    return <p>Loading snail location</p>;
+  }
+
+  if (distance < 5) {
+    <p>Snail kill you ded</p>;
   }
 
   return (
@@ -85,12 +84,7 @@ function SnailChase(props: {
         {Math.round(distance)} meters from you. If you do not move, it will
         reach you in {formatTimeTillSnail(distanceToSnailTime(distance))}
       </p>
-      <Radar
-        width={2000}
-        height={2000}
-        snailX={snailXDistance}
-        snailY={snailYDistance}
-      />
+      <Radar snailX={snailXDistance} snailY={snailYDistance} />
     </>
   );
 }

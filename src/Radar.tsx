@@ -39,17 +39,21 @@ const Axis = ({ domain = [0, 100], range = [0, 500], x = 0, y = 0 }) => {
 };
 
 interface RadarProperties {
-  // should is br doing this with css?
-  width: number;
-  height: number;
   snailX: number;
   snailY: number;
 }
 
 function Radar(props: RadarProperties) {
+  const { snailX, snailY } = props;
+
   const rings = Array(10).fill(0);
   const viewBoxHeight = 1000;
   const viewBoxWidth = 1000;
+
+  const distance = Math.sqrt(Math.pow(snailX, 2) + Math.pow(snailY, 2));
+  const maxAxisValue = Math.floor(Math.log10(distance)) * 100;
+  const scaledSnailX = Math.min(1, snailX / maxAxisValue) * 500;
+  const scaledSnailY = Math.min(1, snailY / maxAxisValue) * 500;
 
   // todo: should we be using D3 to do some of this animating/transforming?
 
@@ -104,18 +108,14 @@ function Radar(props: RadarProperties) {
       ))}
       <g>
         <image
-          x={500 + Math.min(props.snailX, 500) - 40}
-          y={500 + Math.min(props.snailY, 500) - 40}
+          x={500 + scaledSnailX - 40}
+          y={500 + scaledSnailY - 40}
           width="80"
           height="80"
           // https://uxwing.com/snail-icon/</g>
           href="snail-icon.svg"
         ></image>
-        <circle
-          cx={500 + Math.min(props.snailX, 500)}
-          cy={500 + Math.min(props.snailY, 500)}
-          r="50"
-        >
+        <circle cx={500 + scaledSnailX} cy={500 + scaledSnailY} r="50">
           <animate
             attributeType="XML"
             attributeName="fill"
@@ -156,7 +156,11 @@ function Radar(props: RadarProperties) {
           repeatCount="indefinite"
         />
       </g>
-      <Axis x={viewBoxWidth / 2} y={viewBoxWidth / 2}></Axis>
+      <Axis
+        x={viewBoxWidth / 2}
+        y={viewBoxWidth / 2}
+        domain={[0, maxAxisValue]}
+      ></Axis>
       <rect
         x="0"
         width={viewBoxWidth}

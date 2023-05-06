@@ -22,7 +22,7 @@ export function spawnSnail(location: LatLon) {
     throw Error("Cannot spawn snail, snail already spawned");
   }
   snailInformation = {
-    location,
+    location: { lat: location.lat + 0.0001, lon: location.lon + 0.0001 },
     timestamp: Date.now(),
   };
   // todo: this will not be good enough when accounting for people who do not have the site open often
