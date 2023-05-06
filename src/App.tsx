@@ -50,8 +50,6 @@ function SnailChase(props: {
   const [snailInformation, setSnailInformation] =
     useState<SnailInformation | null>(null);
 
-  console.log("snail chanse info", snailInformation);
-
   useEffect(() => {
     setInterval(() => {
       // should snail AI expose this via a useSnailLocation effect?

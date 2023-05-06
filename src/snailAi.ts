@@ -14,7 +14,6 @@ let snailInformation: SnailInformation | null = null;
 
 // the react app should act like this is coming from a server
 export function getSnailInfomation() {
-  console.log(snailInformation);
   return snailInformation;
 }
 
