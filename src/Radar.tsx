@@ -48,7 +48,6 @@ interface RadarProperties {
 
 function Radar(props: RadarProperties) {
   const rings = Array(10).fill(0);
-
   const viewBoxHeight = 1000;
   const viewBoxWidth = 1000;
 
@@ -105,16 +104,16 @@ function Radar(props: RadarProperties) {
       ))}
       <g>
         <image
-          x={Math.max(props.snailX, 500) - 40}
-          y={Math.max(props.snailY, 500) - 40}
+          x={500 + Math.min(props.snailX, 500) - 40}
+          y={500 + Math.min(props.snailY, 500) - 40}
           width="80"
           height="80"
           // https://uxwing.com/snail-icon/</g>
           href="snail-icon.svg"
         ></image>
         <circle
-          cx={Math.max(props.snailX, 500)}
-          cy={Math.max(props.snailY, 500)}
+          cx={500 + Math.min(props.snailX, 500)}
+          cy={500 + Math.min(props.snailY, 500)}
           r="50"
         >
           <animate
@@ -169,34 +168,5 @@ function Radar(props: RadarProperties) {
     </svg>
   );
 }
-
-// class Radar extends Component {
-//   componentDidMount() {
-//     this.drawChart();
-//   }
-//   drawChart() {
-//     const data = [12, 5, 6, 6, 9, 10];
-
-//     const svg = d3
-//       .select("body")
-//       .append("svg")
-//       .attr("width", 700)
-//       .attr("height", 300);
-
-//     svg
-//       .selectAll("rect")
-//       .data(data)
-//       .enter()
-//       .append("rect")
-//       .attr("x", (d, i) => i * 70)
-//       .attr("y", (d, i) => 300 - 10 * d)
-//       .attr("width", 65)
-//       .attr("height", (d, i) => d * 10)
-//       .attr("fill", "green");
-//   }
-//   render() {
-//     return <div></div>;
-//   }
-// }
 
 export default Radar;

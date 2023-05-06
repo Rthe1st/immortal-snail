@@ -2,17 +2,26 @@ import { useEffect } from "react";
 import { useState } from "react";
 // import possessedSnail from "./possessed_snail.webp";
 import "./App.css";
-import { headingDistanceTo, LatLon, moveTo, degToRad } from "geolocation-utils";
+import { headingDistanceTo, LatLon, degToRad } from "geolocation-utils";
 import Radar from "./Radar";
+import { SnailInformation, getSnailInfomation, spawnSnail } from "./snailAi";
 
-// https://hypertextbook.com/facts/1999/AngieYee.shtml
-const SNAIL_METERS_PER_SECOND = 0.013;
-const SNAIL_METERS_PER_MILLISECOND = SNAIL_METERS_PER_SECOND / 1000;
+import geolocate from "mock-geolocation";
+import { SNAIL_METERS_PER_MILLISECOND } from "./snailAi";
 
-interface SnailInformation {
-  location: LatLon;
-  timestamp: number;
-}
+geolocate.use();
+
+geolocate.send({
+  lat: 54.980206086231,
+  lng: 82.898068362003,
+});
+
+setInterval(() => {
+  geolocate.change({
+    lat: 54.980206086231 + (-0.5 + Math.random()) * 0.01,
+    lng: 82.898068362003 + (-0.5 + Math.random()) * 0.01,
+  });
+}, 1000);
 
 function distanceToSnailTime(meters: number): number {
   return meters / SNAIL_METERS_PER_MILLISECOND;
@@ -32,13 +41,32 @@ function formatTimeTillSnail(milliseconds: number): string {
   return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
 }
 
-function SnailChase(props: { location: LatLon; snailLocation: LatLon }) {
-  let { snailLocation, location } = props;
+function SnailChase(props: {
+  location: LatLon;
+  // snailInfomation: SnailInformation;
+}) {
+  let { location } = props;
+
+  const [snailInformation, setSnailInformation] =
+    useState<SnailInformation | null>(null);
+
+  console.log("snail chanse info", snailInformation);
+
+  useEffect(() => {
+    setInterval(() => {
+      // should snail AI expose this via a useSnailLocation effect?
+      setSnailInformation(getSnailInfomation());
+    }, 1000);
+  }, []);
+
   var distance;
   var snailXDistance;
   var snailYDistance;
-  if (snailLocation !== null && location !== null) {
-    const headingDistance = headingDistanceTo(snailLocation, location);
+  if (snailInformation !== null && location !== null) {
+    const headingDistance = headingDistanceTo(
+      snailInformation.location,
+      location
+    );
     snailXDistance =
       Math.sin(degToRad(headingDistance.heading)) * headingDistance.distance;
     snailYDistance =
@@ -54,10 +82,10 @@ function SnailChase(props: { location: LatLon; snailLocation: LatLon }) {
     <>
       <p>
         Your location is {location.lat.toFixed(2)}, {location.lon.toFixed(2)}.
-        The snails location is {snailLocation.lat.toFixed(2)},{" "}
-        {snailLocation.lon.toFixed(2)}. Snail is {Math.round(distance)} meters
-        from you. If you do not move, it will reach you in{" "}
-        {formatTimeTillSnail(distanceToSnailTime(distance))}
+        The snails location is {snailInformation?.location.lat.toFixed(2)},{" "}
+        {snailInformation?.location.lon.toFixed(2)}. Snail is{" "}
+        {Math.round(distance)} meters from you. If you do not move, it will
+        reach you in {formatTimeTillSnail(distanceToSnailTime(distance))}
       </p>
       <Radar
         width={2000}
@@ -72,10 +100,6 @@ function SnailChase(props: { location: LatLon; snailLocation: LatLon }) {
 function App() {
   const [location, setLocation] = useState<LatLon | null>(null);
   const [dealMade, setDealMade] = useState<boolean>(false);
-
-  const [snailInformation, setSnailInformation] =
-    useState<SnailInformation | null>(null);
-
   useEffect(() => {
     const id = navigator.geolocation.watchPosition((position) => {
       setLocation({
@@ -88,59 +112,16 @@ function App() {
     });
   }, []);
 
-  useEffect(() => {
-    if (!dealMade) {
-      return;
-    }
-    if (location === null) {
-      return;
-    }
-    const timer = setInterval(() => {
-      setSnailInformation((snailInformation: SnailInformation | null) => {
-        const now = Date.now();
-        if (snailInformation === null) {
-          return {
-            location,
-            timestamp: now,
-          };
-        } else {
-          const heading = headingDistanceTo(
-            snailInformation.location,
-            location
-          ).heading;
-          const now = Date.now();
-          const timeSinceLastMove = snailInformation.timestamp - now;
-          const newLocation = moveTo(snailInformation.location, {
-            heading: heading,
-            // todo: logic to make sure the snail doesn't over shoot
-            distance: SNAIL_METERS_PER_MILLISECOND * timeSinceLastMove,
-          });
-          return {
-            location: newLocation,
-            timestamp: now,
-          };
-        }
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [dealMade, location]);
-
   const makeDeal = () => {
-    // make this conditional on the users location already being known
     setDealMade(true);
+    spawnSnail(location!);
   };
 
   return (
     <div className="App">
       {/* todo: make the 2 paragraphs a bit more coherent */}
-      {dealMade && snailInformation && location ? (
-        <SnailChase
-          snailLocation={snailInformation.location}
-          location={location}
-        />
+      {dealMade && location ? (
+        <SnailChase location={location} />
       ) : (
         <>
           <p>
@@ -177,7 +158,11 @@ function App() {
             confidence you need to touch the immortal snail when your chance
             comes.
           </p>
-          <button onClick={makeDeal}>Make deal with snail</button>
+          {location ? (
+            <button onClick={makeDeal}>Make deal with snail</button>
+          ) : (
+            <p>Acquiring location</p>
+          )}
         </>
       )}
     </div>
