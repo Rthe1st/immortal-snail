@@ -1,0 +1,30 @@
+#radar-control {
+  display: flex;
+  position: absolute;
+  top: 10%;
+  right: 2%;
+  height: 80%;
+}
+
+.radar-scale {
+  writing-mode: bt-lr;
+  appearance: slider-vertical;
+}
+
+.radar {
+  width: 100%;
+}
+
+#radar-scale-values {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+option {
+  padding: 0;
+}
+
+input[type="range"] {
+  margin: 0;
+}
