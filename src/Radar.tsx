@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import "./Radar.css";
@@ -183,19 +183,27 @@ function Radar(props: RadarProperties) {
     </svg>
   );
 
+  const orientHack: any = useRef(null);
+
+  useEffect(() => {
+    // this hack is needed to make the slider veritcal in firefox
+    orientHack.current.setAttribute("orient", "vertical");
+  }, [orientHack]);
+
   return (
     <>
       <div style={{ position: "relative" }}>
         {radarSvg}
         <div id="radar-control">
           <input
+            ref={orientHack}
             className="radar-scale"
             list="radar-scale-values"
             type="range"
             min={10}
             max={maxRadarRange}
             step={10}
-            orient="vertical"
+            // orient="vertical"
             onChange={(event) =>
               setRadarRange(Number.parseInt(event.target.value))
             }
